@@ -11,6 +11,7 @@ import Favorites from './pages/Favorites';
 function App() {
   return (
     <RecipeProvider>
+      
       <Router>
         <div className="min-h-screen flex flex-col">
           <Navbar />
