@@ -58,9 +58,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
       
       <div className="p-4 flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-medium text-gray-800 group-hover:text-orange-500 transition-colors duration-300">
-            {truncateText(recipe.label, 24)}
-          </h3>
+            <h3 className="text-lg font-medium text-white-800 group-hover:text-red-500 transition-colors duration-200">
+              {truncateText(recipe.label, 24)}
+            </h3>
         </div>
         
         <div className="mt-1 mb-3 flex items-center text-sm text-gray-600">
