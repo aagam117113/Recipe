@@ -30,7 +30,7 @@ const Favorites: React.FC = () => {
               </p>
               <Link 
                 to="/" 
-                className="inline-block px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors"
+                className="inline-block px-6 py-3 bg-red-500 text-black font-medium rounded-md hover:bg-red-600 transition-colors"
               >
                 Discover Recipes
               </Link>

@@ -1,24 +1,27 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
-import { debounce, validateSearchQuery } from '../utils/helpers';
-import { useRecipeContext } from '../contexts/RecipeContext';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
+import { debounce, validateSearchQuery } from "../utils/helpers";
+import { useRecipeContext } from "../contexts/RecipeContext";
 
 interface SearchBarProps {
   defaultValue?: string;
   className?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ defaultValue = '', className = '' }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  defaultValue = "",
+  className = "",
+}) => {
   const [query, setQuery] = useState(defaultValue);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { addToSearchHistory } = useRecipeContext();
 
   // Reset error when query changes
   useEffect(() => {
     if (query && error) {
-      setError('');
+      setError("");
     }
   }, [query, error]);
 
@@ -28,14 +31,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ defaultValue = '', className = ''
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!query.trim()) {
-      setError('Please enter a search term');
+      setError("Please enter a search term");
       return;
     }
 
     if (!validateSearchQuery(query)) {
-      setError('Invalid characters in search');
+      setError("Invalid characters in search");
       return;
     }
 
@@ -47,7 +50,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ defaultValue = '', className = ''
   // Debounced validation
   const debouncedValidation = debounce((value: string) => {
     if (value && !validateSearchQuery(value)) {
-      setError('Invalid characters in search');
+      setError("Invalid characters in search");
     }
   }, 300);
 
@@ -66,20 +69,23 @@ const SearchBar: React.FC<SearchBarProps> = ({ defaultValue = '', className = ''
           onChange={handleChange}
           placeholder="Search for recipes..."
           className={`w-full px-4 py-3 pr-12 rounded-full border ${
-            error ? 'border-red-500' : 'border-gray-300'
-          } focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent shadow-sm`}
+            error ? "border-red-500" : "border-gray-300"
+          } text-black focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent shadow-sm`}
           data-testid="search-input"
         />
         <button
           type="submit"
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-orange-500 focus:outline-none transition-colors"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black-500 hover:text-orange-500 focus:outline-none transition-colors"
           aria-label="Search"
         >
           <Search size={20} />
         </button>
       </form>
       {error && (
-        <p className="text-red-500 text-sm mt-1 ml-2" data-testid="search-error">
+        <p
+          className="text-red-500 text-sm mt-1 ml-2"
+          data-testid="search-error"
+        >
           {error}
         </p>
       )}
