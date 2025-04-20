@@ -43,7 +43,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart 
-            size={18} 
+            size={20} 
             className={favorite ? "fill-red-500 text-red-500" : "text-gray-500"}
           />
         </button>
