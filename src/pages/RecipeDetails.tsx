@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Clock, User, Tag, ArrowLeft, Heart, Printer } from 'lucide-react';
 import { Recipe } from '../types/recipe';
-import { fetchRecipeById } from '../utils/api';
+import { fetchRecipes } from '../utils/api';
 import { formatCookingTime } from '../utils/helpers';
 import { useRecipeContext } from '../contexts/RecipeContext';
 import { RecipeDetailSkeleton } from '../components/SkeletonLoader';
@@ -13,17 +13,25 @@ const RecipeDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { isFavorite, addFavorite, removeFavorite } = useRecipeContext();
-  
   useEffect(() => {
     const loadRecipeDetails = async () => {
       if (!id) return;
-      
+  
       try {
         setLoading(true);
         setError('');
-        
-        const data = await fetchRecipeById(id);
-        setRecipe(data.recipe || null);
+  
+        const data = await fetchRecipes(''); // Pass an empty query to fetch all recipes
+        const recipe = data.hits.find(hit => {
+          const recipeId = hit.recipe.uri.split('#')[1];
+          return recipeId === `recipe_${id}` || hit.recipe.uri === id;
+        });
+  
+        if (!recipe) {
+          throw new Error('Recipe not found');
+        }
+  
+        setRecipe(recipe.recipe || null);
       } catch (err) {
         setError('Failed to load recipe details. Please try again later.');
         console.error('Error loading recipe details:', err);
@@ -31,10 +39,9 @@ const RecipeDetails: React.FC = () => {
         setLoading(false);
       }
     };
-
+  
     loadRecipeDetails();
   }, [id]);
-
   const handleFavoriteToggle = () => {
     if (!recipe) return;
     

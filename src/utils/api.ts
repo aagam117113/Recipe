@@ -1,26 +1,30 @@
 import { SearchResult } from '../types/recipe';
 
-const APP_ID = import.meta.env.VITE_EDAMAM_APP_ID;
-const APP_KEY = import.meta.env.VITE_EDAMAM_APP_KEY;
-const BASE_URL = 'https://api.edamam.com/api/recipes/v2';
+const BASE_URL = 'mock_recipes_50.json';
 
 export const fetchRecipes = async (query: string, filters: Record<string, string> = {}): Promise<SearchResult> => {
   try {
-    const params = new URLSearchParams({
-      type: 'public',
-      q: query,
-      app_id: APP_ID,
-      app_key: APP_KEY,
-      ...filters
-    });
-
-    const response = await fetch(`${BASE_URL}?${params}`);
-    
+    const response = await fetch(BASE_URL);
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      throw new Error('Failed to fetch recipes');
     }
+    const data: SearchResult = await response.json();
     
-    return await response.json();
+    // Filter recipes based on query and filters
+    return {
+      ...data,
+      hits: data.hits.filter(hit => {
+        const recipe = hit.recipe;
+        const matchesQuery = !query || recipe.label.toLowerCase().includes(query.toLowerCase());
+        const matchesFilters = Object.entries(filters).every(([key, value]) => {
+          if (key === 'health') {
+            return recipe.healthLabels.includes(value);
+          }
+          return true;
+        });
+        return matchesQuery && matchesFilters;
+      })
+    };
   } catch (error) {
     console.error('Error fetching recipes:', error);
     throw error;
@@ -29,29 +33,40 @@ export const fetchRecipes = async (query: string, filters: Record<string, string
 
 export const fetchRecipeById = async (id: string): Promise<SearchResult> => {
   try {
-    const recipeId = id.startsWith('http') ? id : `http://www.edamam.com/ontologies/edamam.owl#recipe_${id}`;
-    const encodedId = encodeURIComponent(recipeId);
+    const response = await fetch(BASE_URL);
+    if (!response.ok) {
+      throw new Error('Failed to fetch recipe');
+    }
+    const data: SearchResult = await response.json();
     
-    const params = new URLSearchParams({
-      type: 'public',
-      app_id: APP_ID,
-      app_key: APP_KEY,
+    const recipe = data.hits.find(hit => {
+      const recipeId = hit.recipe.uri.split('#')[1];
+      return recipeId === `recipe_${id}` || hit.recipe.uri === id;
     });
 
-    const response = await fetch(`${BASE_URL}/${encodedId}?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+    if (!recipe) {
+      throw new Error('Recipe not found');
     }
-    
-    return await response.json();
+
+    return {
+      ...data,
+      hits: [recipe]
+    };
   } catch (error) {
-    console.error('Error fetching recipe details:', error);
+    console.error('Error fetching recipe:', error);
     throw error;
   }
 };
 
 export const fetchTrendingRecipes = async (): Promise<SearchResult> => {
-  // For trending, we'll use a popular search term like "popular" or "trending"
-  return fetchRecipes('popular', { random: 'true' });
+  try {
+    const response = await fetch(BASE_URL);
+    if (!response.ok) {
+      throw new Error('Failed to fetch trending recipes');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching trending recipes:', error);
+    throw error;
+  }
 };
